@@ -2,4 +2,3 @@ pylint
 pandas
 sklearn
 jupyterlab
-jupytext
