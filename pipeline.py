@@ -57,15 +57,15 @@ from sklearn.metrics import mean_squared_error
 # The exploration is applied to the train dataset, since the validation dataset is supposed to be unseen data. The basic aspects of the train data are shown bellow.
 
 # %% id="af169977"
-# raw_df = pd.read_csv('data/winequality-red.csv', header=0)
-# train_df, validation_df = train_test_split(
-#   raw_df,
-#   test_size=0.2,
-#   random_state=3
-# )
+raw_df = pd.read_csv('data/winequality-red.csv', header=0)
+train_df, validation_df = train_test_split(
+  raw_df,
+  test_size=0.2,
+  random_state=3
+)
 
-# train_df.to_csv('data/train.csv', header=True, index=True)
-# validation_df.to_csv('data/validation.csv', header=True, index=True)
+train_df.to_csv('data/train.csv', header=True, index=True)
+validation_df.to_csv('data/validation.csv', header=True, index=True)
 
 # %% [markdown] id="z0KUfQ0Lgr02"
 # From the dataset info we can see that the data is really clean, there are no null values. The target variable, quality, is composed by integers, while the features are floats.
@@ -93,7 +93,7 @@ mask = np.triu(np.ones_like(corr, dtype=bool))
 f, ax = plt.subplots(figsize=(11, 9))
 cmap = sns.diverging_palette(230, 20, as_cmap=True)
 sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
-            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+	square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
 # %% [markdown] id="1OyxFfCVliL6"
 # From the violin plots we can see which features contain outliers and how is the distribution of each feature
@@ -145,24 +145,24 @@ mlp = GridSearchCV(
     cv=5,
     return_train_score=True,
 )
-# mlp.fit(standard_train_x, standard_train_y)
+mlp.fit(standard_train_x, standard_train_y)
 
-# results = pd.DataFrame(mlp.cv_results_)
-# results = results[['param_hidden_layer_sizes', 'param_activation',
-#   'param_batch_size', 'param_max_iter','mean_test_score', 'rank_test_score',
-#   'mean_train_score']]
-# results.to_csv('mlp_standard_results.csv', index=False)
-# files.download('mlp_standard_results.csv')
+results = pd.DataFrame(mlp.cv_results_)
+results = results[['param_hidden_layer_sizes', 'param_activation',
+  'param_batch_size', 'param_max_iter','mean_test_score', 'rank_test_score',
+  'mean_train_score']]
+results.to_csv('mlp_standard_results.csv', index=False)
+files.download('mlp_standard_results.csv')
 
 # %% id="pr3APOej5mR2"
-# mlp.fit(minmax_train_x, minmax_train_y)
+mlp.fit(minmax_train_x, minmax_train_y)
 
-# results = pd.DataFrame(mlp.cv_results_)
-# results = results[['param_hidden_layer_sizes', 'param_activation',
-#   'param_batch_size', 'param_max_iter','mean_test_score', 'rank_test_score',
-#   'mean_train_score']]
-# results.to_csv('mlp_minmax_results.csv', index=False)
-# files.download('mlp_minmax_results.csv')
+results = pd.DataFrame(mlp.cv_results_)
+results = results[['param_hidden_layer_sizes', 'param_activation',
+  'param_batch_size', 'param_max_iter','mean_test_score', 'rank_test_score',
+  'mean_train_score']]
+results.to_csv('mlp_minmax_results.csv', index=False)
+files.download('mlp_minmax_results.csv')
 
 # %% [markdown]
 # Evaluate the results output files
@@ -173,26 +173,50 @@ mlp = GridSearchCV(
 
 # %%
 standard_results = pd.read_csv('outputs/mlp_standard_results.csv')
-standard_results['test/train'] = standard_results['mean_test_score']/standard_results['mean_train_score']
-standard_results[standard_results['test/train'] < 1.05].sort_values(['rank_test_score'])
+standard_results['test/train'] = 
+	standard_results['mean_test_score']/standard_results['mean_train_score']
+standard_results[standard_results['test/train'] \
+	< 1.05].sort_values(['rank_test_score'])
 
 # %%
-sample1 = standard_results.query("param_activation == 'logistic' & param_batch_size == 50 & param_max_iter == 400")
-plt.plot(sample1['param_hidden_layer_sizes'], sample1['mean_train_score'], '-o', label='Train')
-plt.plot(sample1['param_hidden_layer_sizes'], sample1['mean_test_score'], '-o', label='Test')
+sample1 = standard_results.query(
+	"""param_activation == 'logistic'
+	& param_batch_size == 50
+	& param_max_iter == 400"""
+)
+plt.plot(
+	sample1['param_hidden_layer_sizes'],
+	sample1['mean_train_score'],
+	'-o', label='Train')
+plt.plot(
+	sample1['param_hidden_layer_sizes'],
+	sample1['mean_test_score'],
+	'-o', label='Test')
 plt.legend()
 plt.title('Overfit Analysis - Standard MLP')
 plt.show()
 
 # %%
 minmax_results = pd.read_csv('outputs/mlp_minmax_results.csv')
-minmax_results['test/train'] = minmax_results['mean_test_score']/minmax_results['mean_train_score']
-minmax_results[minmax_results['test/train'] < 1.05].sort_values(['rank_test_score'])
+minmax_results['test/train'] = 
+	minmax_results['mean_test_score']/minmax_results['mean_train_score']
+minmax_results[minmax_results['test/train'] \
+	< 1.05].sort_values(['rank_test_score'])
 
 # %%
-sample1 = minmax_results.query("param_activation == 'tanh' & param_batch_size == 50 & param_max_iter == 800")
-plt.plot(sample1['param_hidden_layer_sizes'], sample1['mean_train_score'], '-o', label='Train')
-plt.plot(sample1['param_hidden_layer_sizes'], sample1['mean_test_score'], '-o', label='Test')
+sample1 = minmax_results.query(
+	"""param_activation == 'tanh'
+	& param_batch_size == 50
+	& param_max_iter == 800"""
+)
+plt.plot(
+	sample1['param_hidden_layer_sizes'],
+	sample1['mean_train_score'],
+	'-o', label='Train')
+plt.plot(
+	sample1['param_hidden_layer_sizes'],
+	sample1['mean_test_score'],
+	'-o', label='Test')
 plt.legend()
 plt.title('Overfit Analysis - MinMax MLP')
 plt.show()
@@ -204,7 +228,8 @@ plt.show()
 # Fitting the chosen models to the train dataset and predicting the quality of the wine on a never seen validation dataset shows that the results obtained from the standard scaled MLP have a better root mean squared error.
 
 # %%
-validation = pd.read_csv('data/validation.csv', header=0, index_col=0)
+validation = pd.read_csv('data/validation.csv',
+	header=0, index_col=0)
 
 validation_x = validation.iloc[:,:-1]
 validation_y = validation.iloc[:,-1:]
@@ -223,7 +248,9 @@ std_mlp = MLPRegressor(
 )
 
 std_mlp.fit(standard_train_x, standard_train_y)
-std_results = standard_scaler_y.inverse_transform(std_mlp.predict(standard_validation_x).reshape((320,1)))
+std_results = standard_scaler_y.inverse_transform(
+	std_mlp.predict(standard_validation_x).reshape((320,1))
+)
 std_y_pred = std_results.round()
 
 # %% tags=[]
@@ -236,7 +263,9 @@ minmax_mlp = MLPRegressor(
 )
 
 minmax_mlp.fit(minmax_train_x, minmax_train_y)
-minmax_results = minmax_scaler_y.inverse_transform(minmax_mlp.predict(minmax_validation_x).reshape((320,1)))
+minmax_results = minmax_scaler_y.inverse_transform(
+	minmax_mlp.predict(minmax_validation_x).reshape((320,1))
+)
 minmax_y_pred = minmax_results.round()
 
 # %%
@@ -246,8 +275,14 @@ validation_y.head()
 validation_y.to_csv('outputs/predictions.csv', index=False)
 
 # %%
-print(mean_squared_error(validation_y['quality'], validation_y['std_pred']))
-print(mean_squared_error(validation_y['quality'], validation_y['minmax_pred']))
+print(mean_squared_error(
+	validation_y['quality'],
+	validation_y['std_pred'])
+)
+print(mean_squared_error(
+	validation_y['quality'],
+	validation_y['minmax_pred'])
+)
 
 # %% [markdown] id="d4c7df44"
 # ### References
